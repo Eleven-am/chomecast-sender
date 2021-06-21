@@ -1,6 +1,6 @@
 {
   "name": "chomecast-sender",
-  "version": "0.0.25",
+  "version": "0.0.26",
   "description": "A completely typed chromecast sender application",
   "main": "dist/index.js",
   "scripts": {
