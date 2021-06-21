@@ -1,22 +1,20 @@
-declare enum CastEventType {
-    ERROR = 'error',
-    AVAILABLE = 'available',
-    PAUSED = 'paused',
-    CONNECT = 'connect',
-    MUTED = 'muted',
-    DISCONNECT = 'disconnect',
-    NAMESPACE = 'namespace',
-    END = 'end',
-    PLAYING = 'playing',
-    BUFFERING = 'buffering',
-    DURATIONCHANGE = 'durationChanged',
-    TIMEUPDATE = 'timeupdate',
-    VOLUMECHANGE = 'volumechange',
+export const CastEventType = {
+    ERROR: 'error',
+    AVAILABLE: 'available',
+    PAUSED: 'paused',
+    CONNECT: 'connect',
+    MUTED: 'muted',
+    DISCONNECT: 'disconnect',
+    NAMESPACE: 'namespace',
+    END: 'end',
+    PLAYING: 'playing',
+    BUFFERING: 'buffering',
+    DURATIONCHANGE: 'durationChanged',
+    TIMEUPDATE: 'timeupdate',
+    VOLUMECHANGE: 'volumechange',
 }
 
-export type CastHandler = (event: CastEvent) => void;
-
-export interface CastEvent {
+interface CastEvent {
     available: boolean;
     connected: boolean;
     volume: number;
@@ -30,19 +28,19 @@ export interface CastEvent {
     error: CastError | null
 }
 
-export interface CastError {
+interface CastError {
     error: string
 }
 
-export interface VideoState {
+interface VideoState {
     time: number,
     timePretty: string,
-    durationPretty:  string,
+    durationPretty: string,
     duration: number,
     progress: number
 }
 
-export interface MediaObject {
+interface MediaObject {
     src: string;
     currentTime: number;
     paused: boolean;
@@ -57,7 +55,7 @@ export default class Cast {
     device: string = '';
     private readonly receiverApplicationId: string;
     private readonly namespace;
-    private readonly events: { [key: string]: CastHandler[] };
+    private readonly events: { [key: string]: {(event: CastEvent): void}[] };
     private player: cast.framework.RemotePlayer | undefined;
     private castSession: cast.framework.CastSession | null;
     private src: string = '';
@@ -97,7 +95,7 @@ export default class Cast {
      * @param name name of event to listen for
      * @param listener callback to handle event
      */
-    on(name: CastEventType, listener: CastHandler) {
+    on(name: string, listener: (event: CastEvent) => void) {
         if (!this.events[name])
             this.events[name] = [];
 
@@ -109,7 +107,7 @@ export default class Cast {
      * @param name
      * @param listenerToRemove
      */
-    off(name: CastEventType, listenerToRemove: CastHandler) {
+    off(name: string, listenerToRemove: (event: CastEvent) => void) {
         if (!this.events[name])
             throw new Error(`Can't remove a listener. Event "${name}" doesn't exits.`);
 
@@ -199,7 +197,10 @@ export default class Cast {
         cast.framework.CastContext.getInstance().requestSession()
             .then(() => {
                 if (!cast.framework.CastContext.getInstance().getCurrentSession())
-                    return this.emit(CastEventType.ERROR, {...this.buildEvent(), error: {error: 'Could not connect with the cast device'}});
+                    return this.emit(CastEventType.ERROR, {
+                        ...this.buildEvent(),
+                        error: {error: 'Could not connect with the cast device'}
+                    });
 
                 return this.emit(CastEventType.CONNECT, this.buildEvent())
             }).catch(err => {
@@ -235,11 +236,11 @@ export default class Cast {
         this.state = 'disconnected';
     }
 
-    private emit(name: CastEventType, data: CastEvent) {
+    private emit(name: string, data: CastEvent) {
         if (!this.events[name])
             console.error(`Can't find a listener. Event "${name}" doesn't exits.`);
 
-        const fireCallbacks = (callback: CastHandler) => {
+        const fireCallbacks = (callback: (event: CastEvent) => void) => {
             callback(data);
         };
 
@@ -319,7 +320,7 @@ export default class Cast {
         }
 
         this.state = !this.connected ? 'disconnected' : 'connected'
-        this.emit(this.state === 'connected' ? CastEventType.CONNECT: CastEventType.DISCONNECT, this.buildEvent());
+        this.emit(this.state === 'connected' ? CastEventType.CONNECT : CastEventType.DISCONNECT, this.buildEvent());
     }
 
     private isMutedChanged() {
