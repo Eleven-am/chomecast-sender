@@ -184,7 +184,7 @@ export default class Cast {
             this.volume(videoPlayer.volume);
             return this;
         }, (err) => {
-            return this.emit('error', err);
+            return this.emit('error', {error: err});
         });
     }
 
