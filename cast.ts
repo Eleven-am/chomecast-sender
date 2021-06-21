@@ -8,6 +8,22 @@ enum RemotePlayerEventType {
     PLAYER_STATE_CHANGED = "playerStateChanged",
 }
 
+export enum CastEventType {
+    ERROR = 'error',
+    AVAILABLE = 'available',
+    PAUSED = 'paused',
+    CONNECT = 'connect',
+    MUTED = 'muted',
+    DISCONNECT = 'disconnect',
+    NAMESPACE = 'namespace',
+    END = 'end',
+    PLAYING = 'playing',
+    BUFFERING = 'buffering',
+    DURATIONCHANGE = 'durationChanged',
+    TIMEUPDATE = 'timeupdate',
+    VOLUMECHANGE = 'volumechange',
+}
+
 export type CastHandler = (event: CastEvent) => void;
 
 export interface Event {
@@ -92,7 +108,7 @@ export default class Cast {
      * @param name name of event to listen for
      * @param listener callback to handle event
      */
-    on(name: string, listener: CastHandler) {
+    on(name: CastEventType, listener: CastHandler) {
         if (!this.events[name])
             this.events[name] = [];
 
@@ -104,7 +120,7 @@ export default class Cast {
      * @param name
      * @param listenerToRemove
      */
-    off(name: string, listenerToRemove: CastHandler) {
+    off(name: CastEventType, listenerToRemove: CastHandler) {
         if (!this.events[name])
             throw new Error(`Can't remove a listener. Event "${name}" doesn't exits.`);
 
@@ -184,7 +200,7 @@ export default class Cast {
             this.volume(videoPlayer.volume);
             return this;
         }, (err) => {
-            return this.emit('error', {error: err});
+            return this.emit(CastEventType.ERROR, {error: err});
         });
     }
 
@@ -195,9 +211,11 @@ export default class Cast {
         cast.framework.CastContext.getInstance().requestSession()
             .then(() => {
                 if (!cast.framework.CastContext.getInstance().getCurrentSession())
-                    return this.emit('error', {error: 'Could not connect with the cast device'});
+                    return this.emit(CastEventType.ERROR, {error: 'Could not connect with the cast device'});
+
+                return this.emit(CastEventType.CONNECT, this.buildEvent())
             }).catch(err => {
-            this.emit('error', err);
+            this.emit(CastEventType.ERROR, err);
         })
     }
 
@@ -206,7 +224,7 @@ export default class Cast {
      */
     disconnect() {
         this.connected = false;
-        this.emit('disconnect', this.buildEvent());
+        this.emit(CastEventType.DISCONNECT, this.buildEvent());
 
         cast.framework.CastContext.getInstance().endCurrentSession(true);
         this.controller?.stop();
@@ -229,7 +247,7 @@ export default class Cast {
         this.state = 'disconnected';
     }
 
-    private emit(name: string, data: CastEvent) {
+    private emit(name: CastEventType, data: CastEvent) {
         if (!this.events[name])
             console.error(`Can't find a listener. Event "${name}" doesn't exits.`);
 
@@ -270,7 +288,7 @@ export default class Cast {
     private init(tries = 0) {
         if (!window.chrome || !window.chrome.cast || !window.chrome.cast.isAvailable) {
             if (tries > 20)
-                this.emit('available', {...this.buildEvent(), available: false});
+                this.emit(CastEventType.AVAILABLE, {...this.buildEvent(), available: false});
             else
                 setTimeout(() => {
                     this.init(tries++)
@@ -294,7 +312,7 @@ export default class Cast {
             this.controller.addEventListener(RemotePlayerEventType.DURATION_CHANGED, this.durationChanged.bind(this));
             this.controller.addEventListener(RemotePlayerEventType.VOLUME_LEVEL_CHANGED, this.volumeLevelChanged.bind(this));
             this.controller.addEventListener(RemotePlayerEventType.PLAYER_STATE_CHANGED, this.playerStateChanged.bind(this));
-            this.emit('available', {...this.buildEvent(), available: true});
+            this.emit(CastEventType.AVAILABLE, {...this.buildEvent(), available: true});
             this.available = true;
         }
     }
@@ -308,30 +326,30 @@ export default class Cast {
 
             if (this.castSession)
                 this.castSession.addMessageListener(this.namespace, (namespace, data) => {
-                    this.emit('namespace', {...this.buildEvent(), namespaceResponse: data});
+                    this.emit(CastEventType.NAMESPACE, {...this.buildEvent(), namespaceResponse: data});
                 })
         }
 
         this.state = !this.connected ? 'disconnected' : 'connected'
-        this.emit(this.state.replace('ed', ''), this.buildEvent());
+        this.emit(this.state === 'connected' ? CastEventType.CONNECT: CastEventType.DISCONNECT, this.buildEvent());
     }
 
     private isMutedChanged() {
         const old = this.muted
         this.muted = this.player?.isMuted || false;
         if (old !== this.muted)
-            this.emit('muted', this.buildEvent());
+            this.emit(CastEventType.MUTED, this.buildEvent());
     }
 
     private isPausedChanged() {
         this.paused = this.player?.isPaused || false;
-        this.emit('paused', this.buildEvent())
+        this.emit(CastEventType.PAUSED, this.buildEvent())
     }
 
     private playerStateChanged() {
         this.connected = this.player?.isConnected || false;
         if (!this.connected)
-            this.emit('disconnect', {...this.buildEvent(), state: this.buildState()});
+            this.emit(CastEventType.DISCONNECT, {...this.buildEvent(), state: this.buildState()});
 
         const event = {...this.buildEvent(), state: this.buildState()};
         this.device = cast.framework.CastContext.getInstance().getCurrentSession()?.getCastDevice().friendlyName || this.device;
@@ -339,14 +357,14 @@ export default class Cast {
         switch (this.state) {
             case 'idle':
                 this.state = 'ended';
-                this.emit('end', {end: true, ...this.buildEvent()});
+                this.emit(CastEventType.END, {end: true, ...this.buildEvent()});
                 break;
             case 'buffering':
-                this.emit('buffering', event)
+                this.emit(CastEventType.BUFFERING, event)
                 break;
             case 'playing':
                 setTimeout(() => {
-                    this.emit('playing', event)
+                    this.emit(CastEventType.PLAYING, event)
                 })
                 break;
         }
@@ -354,19 +372,19 @@ export default class Cast {
 
     private durationChanged() {
         this.duration = this.player?.duration || this.duration;
-        this.emit('durationChanged', this.buildEvent());
+        this.emit(CastEventType.DURATIONCHANGE, this.buildEvent());
     }
 
     private currentTimeChanged() {
         let past = this.time;
         const event = {...this.buildEvent(), state: this.buildState()};
         if (past !== this.time && !this.player?.isPaused)
-            this.emit('timeupdate', event);
+            this.emit(CastEventType.TIMEUPDATE, event);
     }
 
     private volumeLevelChanged() {
         this.volumeLevel = Number((this.player?.volumeLevel || this.volumeLevel).toFixed(1));
         if (this.player?.isMediaLoaded)
-            this.emit('volumechange', this.buildEvent());
+            this.emit(CastEventType.VOLUMECHANGE, this.buildEvent());
     }
 }
