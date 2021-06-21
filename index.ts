@@ -193,13 +193,12 @@ export default class Cast {
         let request = new chrome.cast.media.LoadRequest(mediaInfo);
         request.currentTime = videoPlayer.currentTime;
         request.autoplay = !videoPlayer.paused;
-
         cast.framework.CastContext.getInstance().getCurrentSession()?.loadMedia(request).then(() => {
             this.device = cast.framework.CastContext.getInstance().getCurrentSession()?.getCastDevice().friendlyName || this.device
             this.volume(videoPlayer.volume);
             return this;
         }, (err) => {
-            return this.emit(CastEventType.ERROR, {error: err, ...this.buildEvent()});
+            return this.emit(CastEventType.ERROR, {...this.buildEvent(), error: err});
         });
     }
 
@@ -356,7 +355,7 @@ export default class Cast {
         switch (this.state) {
             case 'idle':
                 this.state = 'ended';
-                this.emit(CastEventType.END, {end: true, ...this.buildEvent()});
+                this.emit(CastEventType.END, {...this.buildEvent(), end: true,});
                 break;
             case 'buffering':
                 this.emit(CastEventType.BUFFERING, event)
