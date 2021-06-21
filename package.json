@@ -1,12 +1,20 @@
 {
   "name": "chomecast-sender",
-  "version": "0.0.1",
+  "version": "0.0.11",
   "description": "A completely typed chromecast sender application",
   "main": "cast.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["chromecast", "typescript", "chromecast-sender"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Eleven-am/chomecast-sender.git"
+  },
+  "keywords": [
+    "chromecast",
+    "typescript",
+    "chromecast-sender"
+  ],
   "author": "Roy OSSAI",
   "license": "MIT",
   "dependencies": {
