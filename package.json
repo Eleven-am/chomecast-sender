@@ -1,0 +1,15 @@
+{
+  "name": "chomecast-sender",
+  "version": "0.0.1",
+  "description": "A completely typed chromecast sender application",
+  "main": "cast.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["chromecast", "typescript", "chromecast-sender"],
+  "author": "Roy OSSAI",
+  "license": "MIT",
+  "dependencies": {
+    "@types/chromecast-caf-sender": "^1.0.3"
+  }
+}
