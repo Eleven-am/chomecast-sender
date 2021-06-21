@@ -26,7 +26,7 @@ export enum CastEventType {
 
 export type CastHandler = (event: CastEvent) => void;
 
-export interface Event {
+export interface CastEvent {
     available: boolean;
     connected: boolean;
     volume: number;
@@ -37,6 +37,7 @@ export interface Event {
     namespaceResponse?: string;
     /** Holds the current state of the remote player */
     state?: VideoState
+    error: CastError | null
 }
 
 export interface CastError {
@@ -57,8 +58,6 @@ export interface MediaObject {
     paused: boolean;
     volume: number;
 }
-
-export type CastEvent = Event | CastError
 
 export default class Cast {
     connected: boolean;
@@ -200,7 +199,7 @@ export default class Cast {
             this.volume(videoPlayer.volume);
             return this;
         }, (err) => {
-            return this.emit(CastEventType.ERROR, {error: err});
+            return this.emit(CastEventType.ERROR, {error: err, ...this.buildEvent()});
         });
     }
 
@@ -211,7 +210,7 @@ export default class Cast {
         cast.framework.CastContext.getInstance().requestSession()
             .then(() => {
                 if (!cast.framework.CastContext.getInstance().getCurrentSession())
-                    return this.emit(CastEventType.ERROR, {error: 'Could not connect with the cast device'});
+                    return this.emit(CastEventType.ERROR, {...this.buildEvent(), error: {error: 'Could not connect with the cast device'}});
 
                 return this.emit(CastEventType.CONNECT, this.buildEvent())
             }).catch(err => {
@@ -273,7 +272,7 @@ export default class Cast {
         }
     }
 
-    private buildEvent(): Event {
+    private buildEvent(): CastEvent {
         return {
             available: this.available,
             connected: this.connected,
@@ -281,7 +280,7 @@ export default class Cast {
             paused: this.paused,
             muted: this.muted,
             end: false,
-            device: this.device
+            device: this.device, error: null
         }
     }
 
