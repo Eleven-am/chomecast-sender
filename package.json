@@ -1,6 +1,6 @@
 {
   "name": "chomecast-sender",
-  "version": "0.0.13",
+  "version": "0.0.20",
   "description": "A completely typed chromecast sender application",
   "main": "index.ts",
   "scripts": {

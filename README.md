@@ -19,7 +19,6 @@ This is a CAF-Sender application completely built in Typescript with support for
 ```
 import Chromecast from 'chomecast-sender';
 const cast = new Chromecast(receiverApplicationId);
-import {CastEventType} from 'chomecast-sender';
 
 cast.connect();
 cast.disconnect();
@@ -30,11 +29,11 @@ cast.muteUnmute();
 cast.castMedia(HTMLVideoElement);
 await cast.send(namespaceObject);
 
-cast.on(CastEventType.AVAILABLE, event: CastEvent => {
+cast.on(castEvents.EventType.AVAILABLE, event: CastEvent => {
   //..code goes here
 })
 
-cast.off(CastEventType.AVAILABLE, event: CastEvent => {
+cast.off(castEvents.EventType.AVAILABLE, event: CastEvent => {
    //..code goes here
 })
 ```

@@ -1,14 +1,4 @@
-enum RemotePlayerEventType {
-    IS_CONNECTED_CHANGED = "isConnectedChanged",
-    DURATION_CHANGED = "durationChanged",
-    CURRENT_TIME_CHANGED = "currentTimeChanged",
-    IS_PAUSED_CHANGED = "isPausedChanged",
-    VOLUME_LEVEL_CHANGED = "volumeLevelChanged",
-    IS_MUTED_CHANGED = "isMutedChanged",
-    PLAYER_STATE_CHANGED = "playerStateChanged",
-}
-
-export enum CastEventType {
+declare enum CastEventType {
     ERROR = 'error',
     AVAILABLE = 'available',
     PAUSED = 'paused',
@@ -303,13 +293,13 @@ export default class Cast {
             this.player = new cast.framework.RemotePlayer();
             this.controller = new cast.framework.RemotePlayerController(this.player);
 
-            this.controller.addEventListener(RemotePlayerEventType.IS_CONNECTED_CHANGED, this.isConnectedChanged.bind(this));
-            this.controller.addEventListener(RemotePlayerEventType.IS_MUTED_CHANGED, this.isMutedChanged.bind(this));
-            this.controller.addEventListener(RemotePlayerEventType.IS_PAUSED_CHANGED, this.isPausedChanged.bind(this));
-            this.controller.addEventListener(RemotePlayerEventType.CURRENT_TIME_CHANGED, this.currentTimeChanged.bind(this));
-            this.controller.addEventListener(RemotePlayerEventType.DURATION_CHANGED, this.durationChanged.bind(this));
-            this.controller.addEventListener(RemotePlayerEventType.VOLUME_LEVEL_CHANGED, this.volumeLevelChanged.bind(this));
-            this.controller.addEventListener(RemotePlayerEventType.PLAYER_STATE_CHANGED, this.playerStateChanged.bind(this));
+            this.controller.addEventListener(cast.framework.RemotePlayerEventType.IS_CONNECTED_CHANGED, this.isConnectedChanged.bind(this));
+            this.controller.addEventListener(cast.framework.RemotePlayerEventType.IS_MUTED_CHANGED, this.isMutedChanged.bind(this));
+            this.controller.addEventListener(cast.framework.RemotePlayerEventType.IS_PAUSED_CHANGED, this.isPausedChanged.bind(this));
+            this.controller.addEventListener(cast.framework.RemotePlayerEventType.CURRENT_TIME_CHANGED, this.currentTimeChanged.bind(this));
+            this.controller.addEventListener(cast.framework.RemotePlayerEventType.DURATION_CHANGED, this.durationChanged.bind(this));
+            this.controller.addEventListener(cast.framework.RemotePlayerEventType.VOLUME_LEVEL_CHANGED, this.volumeLevelChanged.bind(this));
+            this.controller.addEventListener(cast.framework.RemotePlayerEventType.PLAYER_STATE_CHANGED, this.playerStateChanged.bind(this));
             this.emit(CastEventType.AVAILABLE, {...this.buildEvent(), available: true});
             this.available = true;
         }
