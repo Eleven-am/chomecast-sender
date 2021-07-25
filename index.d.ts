@@ -51,7 +51,7 @@ export default class Cast {
     private readonly receiverApplicationId: string;
     private readonly namespace: string;
     private readonly events: { [key: string]: {(event: CastEvent): void}[] };
-    private player: cast.framework.RemotePlayer | undefined;
+    private player: cast.framework.RemotePlayer | null;
     private castSession: cast.framework.CastSession | null;
     private src: string;
     private timePretty: string;

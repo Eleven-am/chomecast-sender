@@ -56,7 +56,7 @@ export default class Cast {
     private readonly receiverApplicationId: string;
     private readonly namespace;
     private readonly events: { [key: string]: {(event: CastEvent): void}[] };
-    private player: cast.framework.RemotePlayer | undefined;
+    private player: cast.framework.RemotePlayer | null;
     private castSession: cast.framework.CastSession | null;
     private src: string = '';
     private timePretty: string = '';
@@ -81,9 +81,10 @@ export default class Cast {
 
         this.events = {};
 
+        this.player = null
         this.castSession = null;
         this.connected = false;
-        this.device = 'Chromecast';
+        this.device = '';
         this.receiverApplicationId = receiverApplicationId;
         this.namespace = namespace || 'urn:x-cast:com.custom.cast';
         this.reset();
@@ -217,14 +218,14 @@ export default class Cast {
 
         cast.framework.CastContext.getInstance().endCurrentSession(true);
         this.controller?.stop();
-        this.device = 'Chromecast';
+        this.device = '';
 
         this.reset()
         return this;
     }
 
     private reset() {
-        this.src = ''
+        this.src = '';
         this.volumeLevel = 1;
         this.muted = false;
         this.paused = false;
