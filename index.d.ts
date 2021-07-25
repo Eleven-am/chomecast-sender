@@ -48,20 +48,20 @@ export default class Cast {
     muted: boolean;
     paused: boolean;
     device: string;
-    private readonly receiverApplicationId;
-    private readonly namespace;
-    private readonly events;
-    private player;
-    private castSession;
-    private src;
-    private timePretty;
-    private durationPretty;
-    private state;
-    private time;
-    private volumeLevel;
-    private duration;
-    private progress;
-    private controller;
+    private readonly receiverApplicationId: string;
+    private readonly namespace: string;
+    private readonly events: { [key: string]: {(event: CastEvent): void}[] };
+    private player: cast.framework.RemotePlayer | undefined;
+    private castSession: cast.framework.CastSession | null;
+    private src: string;
+    private timePretty: string;
+    private durationPretty: string;
+    private state: string;
+    private time: number;
+    private volumeLevel: number;
+    private duration: number;
+    private progress: number;
+    private controller: cast.framework.RemotePlayerController | undefined;
     /**
      * @param receiverApplicationId id for chromecast receiver application
      * @param namespace for CAFs that support namespace exchange; default: 'urn:x-cast:com.custom.cast'
@@ -116,17 +116,17 @@ export default class Cast {
      * @desc disconnects from remote device
      */
     disconnect(): this;
-    private reset;
-    private emit;
-    private buildState;
-    private buildEvent;
-    private init;
-    private isConnectedChanged;
-    private isMutedChanged;
-    private isPausedChanged;
-    private playerStateChanged;
-    private durationChanged;
-    private currentTimeChanged;
-    private volumeLevelChanged;
+    private reset(): void;
+    private emit(name: string, data: CastEvent): void;
+    private buildState(): VideoState;
+    private buildEvent(): CastEvent;
+    private init(tries: number): void;
+    private isConnectedChanged(): void;
+    private isMutedChanged(): void;
+    private isPausedChanged(): void;
+    private playerStateChanged(): void;
+    private durationChanged(): void;
+    private currentTimeChanged(): void;
+    private volumeLevelChanged(): void;
 }
 export {};
