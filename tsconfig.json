@@ -3,9 +3,11 @@
     "target": "es6",
     "module": "commonjs",
     "rootDir": "./",
-    "outDir": "./build",
+    "outDir": "./dist",
     "esModuleInterop": true,
     "moduleResolution": "node",
+    "declaration": true,
+    "declarationDir": "./dist",
     "strict": false
   }
 }
