@@ -1,17 +1,17 @@
-export enum CastEventType {
-    ERROR = 'error',
-    AVAILABLE = 'available',
-    PAUSED = 'paused',
-    CONNECT = 'connect',
-    MUTED = 'muted',
-    DISCONNECT = 'disconnect',
-    NAMESPACE = 'namespace',
-    END = 'end',
-    PLAYING = 'playing',
-    BUFFERING = 'buffering',
-    DURATIONCHANGE = 'durationChanged',
-    TIMEUPDATE = 'timeupdate',
-    VOLUMECHANGE = 'volumechange',
+export const CastEventType = {
+    ERROR: 'error',
+    AVAILABLE: 'available',
+    PAUSED: 'paused',
+    CONNECT: 'connect',
+    MUTED: 'muted',
+    DISCONNECT: 'disconnect',
+    NAMESPACE: 'namespace',
+    END: 'end',
+    PLAYING: 'playing',
+    BUFFERING: 'buffering',
+    DURATIONCHANGE: 'durationChanged',
+    TIMEUPDATE: 'timeupdate',
+    VOLUMECHANGE: 'volumechange',
 }
 
 interface CastEvent {

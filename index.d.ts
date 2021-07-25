@@ -1,18 +1,18 @@
-export declare enum CastEventType {
-    ERROR = "error",
-    AVAILABLE = "available",
-    PAUSED = "paused",
-    CONNECT = "connect",
-    MUTED = "muted",
-    DISCONNECT = "disconnect",
-    NAMESPACE = "namespace",
-    END = "end",
-    PLAYING = "playing",
-    BUFFERING = "buffering",
-    DURATIONCHANGE = "durationChanged",
-    TIMEUPDATE = "timeupdate",
-    VOLUMECHANGE = "volumechange"
-}
+export declare const CastEventType: {
+    ERROR: string;
+    AVAILABLE: string;
+    PAUSED: string;
+    CONNECT: string;
+    MUTED: string;
+    DISCONNECT: string;
+    NAMESPACE: string;
+    END: string;
+    PLAYING: string;
+    BUFFERING: string;
+    DURATIONCHANGE: string;
+    TIMEUPDATE: string;
+    VOLUMECHANGE: string;
+};
 interface CastEvent {
     available: boolean;
     connected: boolean;
