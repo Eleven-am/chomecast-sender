@@ -1,9 +1,9 @@
 {
   "name": "chomecast-sender",
-  "version": "0.0.27",
+  "version": "0.0.28",
   "description": "A completely typed chromecast sender application",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
+  "main": "index.js",
+  "types": "index.d.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
