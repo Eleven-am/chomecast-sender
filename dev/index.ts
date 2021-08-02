@@ -14,7 +14,7 @@ export const CastEventType = {
     VOLUMECHANGE: 'volumechange',
 }
 
-interface CastEvent {
+export interface CastEvent {
     available: boolean;
     connected: boolean;
     volume: number;
@@ -22,17 +22,17 @@ interface CastEvent {
     muted: boolean;
     device: string;
     end: boolean;
-    namespaceResponse?: string;
-    /** Holds the current state of the remote player */
-    state?: VideoState
+    buffering: boolean;
     error: CastError | null
+    namespaceResponse?: string;
+    state: VideoState
 }
 
-interface CastError {
+export interface CastError {
     error: string
 }
 
-interface VideoState {
+export interface VideoState {
     time: number,
     timePretty: string,
     durationPretty: string,
@@ -40,7 +40,7 @@ interface VideoState {
     progress: number
 }
 
-interface MediaObject {
+export interface MediaObject {
     src: string;
     currentTime: number;
     paused: boolean;
@@ -265,13 +265,15 @@ export default class Cast {
 
     private buildEvent(): CastEvent {
         return {
+            buffering: false,
             available: this.available,
             connected: this.connected,
             volume: this.volumeLevel,
             paused: this.paused,
             muted: this.muted,
             end: false,
-            device: this.device, error: null
+            device: this.device, error: null,
+            state: this.buildState()
         }
     }
 
@@ -339,18 +341,18 @@ export default class Cast {
     private playerStateChanged() {
         this.connected = this.player?.isConnected || false;
         if (!this.connected)
-            this.emit(CastEventType.DISCONNECT, {...this.buildEvent(), state: this.buildState()});
+            this.emit(CastEventType.DISCONNECT, this.buildEvent());
 
-        const event = {...this.buildEvent(), state: this.buildState()};
+        const event = this.buildEvent();
         this.device = cast.framework.CastContext.getInstance().getCurrentSession()?.getCastDevice().friendlyName || this.device;
         this.state = this.player?.playerState?.toLowerCase() || '';
         switch (this.state) {
             case 'idle':
                 this.state = 'ended';
-                this.emit(CastEventType.END, {...this.buildEvent(), end: true,});
+                this.emit(CastEventType.END, {...this.buildEvent(), end: true});
                 break;
             case 'buffering':
-                this.emit(CastEventType.BUFFERING, event)
+                this.emit(CastEventType.BUFFERING, {...event, buffering: true})
                 break;
             case 'playing':
                 setTimeout(() => {
@@ -366,10 +368,8 @@ export default class Cast {
     }
 
     private currentTimeChanged() {
-        let past = this.time;
-        const event = {...this.buildEvent(), state: this.buildState()};
-        if (past !== this.time && !this.player?.isPaused)
-            this.emit(CastEventType.TIMEUPDATE, event);
+        const event = this.buildEvent();
+        this.emit(CastEventType.TIMEUPDATE, event);
     }
 
     private volumeLevelChanged() {

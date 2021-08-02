@@ -13,7 +13,7 @@ export declare const CastEventType: {
     TIMEUPDATE: string;
     VOLUMECHANGE: string;
 };
-interface CastEvent {
+export interface CastEvent {
     available: boolean;
     connected: boolean;
     volume: number;
@@ -21,22 +21,22 @@ interface CastEvent {
     muted: boolean;
     device: string;
     end: boolean;
-    namespaceResponse?: string;
-    /** Holds the current state of the remote player */
-    state?: VideoState;
+    buffering: boolean;
     error: CastError | null;
+    namespaceResponse?: string;
+    state: VideoState;
 }
-interface CastError {
+export interface CastError {
     error: string;
 }
-interface VideoState {
+export interface VideoState {
     time: number;
     timePretty: string;
     durationPretty: string;
     duration: number;
     progress: number;
 }
-interface MediaObject {
+export interface MediaObject {
     src: string;
     currentTime: number;
     paused: boolean;
@@ -129,4 +129,3 @@ export default class Cast {
     private currentTimeChanged(): void;
     private volumeLevelChanged(): void;
 }
-export {};
